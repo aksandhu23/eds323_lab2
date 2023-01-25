@@ -1,7 +1,7 @@
 ---
 title: "Lab 2"
-author: "Amritpal Sandhu"
-date: "2023-01-18"
+author: "Amritpal Sandhu, Collaborator: Elise Gonzales"
+date: "2023-01-24"
 output: html_document
 ---
 ```{r setup, include=FALSE}
@@ -298,7 +298,7 @@ Question 1: Now take the recipe and model specification that just created and bu
 
 ```{r, include=TRUE, echo=TRUE}
 # Bundle recipe and model specification into a workflow
-poly_wf <- workflow() %>% 
+poly_df <- workflow() %>% 
   add_recipe(poly_pumpkins_recipe) %>% 
   add_model(poly_spec)
 ```
@@ -306,7 +306,7 @@ poly_wf <- workflow() %>%
 Question 2: fit a model to the pumpkins_train data using your workflow and assign it to poly_wf_fit
 ```{r, include=TRUE, echo=TRUE}
 # Create a model using the workflow
-poly_wf_fit <- poly_wf %>% 
+poly_wf_fit <- poly_df %>% 
   fit(data = pumpkins_train)
 ```
 
@@ -328,10 +328,12 @@ poly_results %>% slice_head(n = 5)
 Now let's evaluate how the model performed on the test_set using yardstick::metrics().
 ```{r, include=TRUE, echo=TRUE}
 metrics(data = poly_results, truth = price, estimate = .pred)
+
+metrics(data = lm_results, truth = price, estimate = .pred)
 ```
 Question 3: How do the performance metrics differ between the linear model from last week and the polynomial model we fit today?  Which model performs better on predicting the price of different packages of pumpkins?
 
-**The linear regression model performs better.**
+**The polynomial regression is a better fit compared to the linear regression model and it also performs better. The rmse (root mean square error) describes the standard deviation of difference between predicted and observed values so the lower value in the polynomial regression means there are less errors and it is a better fit. For the rsq or coefficient of determination, values closer to 0 means the there is no relationship and values closer to 1 means there is a strong relationship and since the polynomial regression has a value closer to 1, it performs better at predicting the price.**
 
 Let's visualize our model results.  First prep the results by binding the encoded package variable to them.
 ```{r, include=TRUE, echo=TRUE}
@@ -431,7 +433,7 @@ poly_wf_var <- workflow() %>%
   - Create a model by fitting the workflow
 ```{r, include=TRUE, echo=TRUE}
 # Create a model
-poly_wf_fit_var <- poly_wf %>% 
+poly_wf_fit_var <- poly_df %>% 
   fit(data = pumpkins_train)
 ```
 
@@ -470,18 +472,18 @@ plot_results %>%
 # Make a scatter plot
 plot_results_var %>%
   ggplot(mapping = aes(x = variety_integer, y = price)) +
-   geom_point(size = 1.6) +
+   geom_point(size = 1.6, alpha = .2) +
    # Overlay a line of best fit
    geom_line(aes(y = .pred), color = "orange", size = 1.2) +
-   xlab("variety")
+   labs(x = "Variety", y = "Price", title = "Variety vs Price") + theme(plot.title = element_text(hjust = 0.5))
 
 
 # Graph with geom_smooth
 plot_results_var %>%
   ggplot(mapping = aes(x = variety_integer, y = price)) +
-   geom_point(size = 1.6) +
+   geom_point(size = 1.6, alpha = .2) +
    # Overlay a geom_smooth line
-   xlab("variety") + geom_smooth(method = lm, formula = y ~ poly(x, degree = 2), color = "midnightblue", size = 1.2, se = FALSE)
+    geom_smooth(method = lm, formula = y ~ poly(x, degree = 2), color = "orange", size = 1.2, se = FALSE) + labs(x = "Variety", y = "Price", title = "Variety vs Price Smooth Plot") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
   
